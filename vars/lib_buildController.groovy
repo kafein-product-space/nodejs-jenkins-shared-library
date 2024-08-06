@@ -16,4 +16,3 @@ def call(Map config) {
         """
     }
 }
-<
