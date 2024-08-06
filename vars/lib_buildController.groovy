@@ -5,17 +5,15 @@ def call(Map config) {
         builder = "${tool config.b_config.project.builderVersion}/bin/npm"
     }
 
-    config.b_config.containerConfig.each { it ->
-        def path = "."
+    def path = "."
 
-        if (it.containsKey("path")) {
-            path = it.path
-        }
-
-        sh """
-        cd ${path} && \
-        ${builder} install && \
-        ${builder} run ${config.b_config.project.buildCommand ? config.b_config.project.buildCommand : 'build'}
-        """
+    if (config.b_config.containerConfig.containsKey("path")) {
+        path = it.path
     }
+
+    sh """
+    cd ${path} && \
+    ${builder} install && \
+    ${builder} run ${config.b_config.project.buildCommand ? config.b_config.project.buildCommand : 'build'}
+    """
 }
