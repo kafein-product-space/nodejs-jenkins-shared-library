@@ -1,12 +1,23 @@
 def call(Map config) {
-    def builder = "npm"
+    config.b_config.projects.each { it ->
+        def builder = "npm"
 
-    if ( config.b_config.project.builderVersion != "nodejs" ) {
-        builder = "${tool config.b_config.project.builderVersion}/bin/npm"
+        if (project.builderVersion != "nodejs") {
+            builder = "${tool project.builderVersion}/bin/npm"
+        }
+
+        if (project.containsKey('path')) {
+            // Run the command if the key exists
+            sh """
+            cd ${it.path} && \
+            ${builder} install && \
+            ${builder} run ${project.buildCommand ? project.buildCommand : 'build'}
+            """
+        } else {
+            sh """
+            ${builder} install && \
+            ${builder} run ${project.buildCommand ? project.buildCommand : 'build'}
+            """
+        }
     }
-
-    sh """
-    ${builder} install && \
-    ${builder} run ${config.b_config.project.buildCommand ? config.b_config.project.buildCommand : 'build'}
-    """
 }
