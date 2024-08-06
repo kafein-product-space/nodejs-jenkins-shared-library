@@ -1,5 +1,5 @@
 def call(Map config) {
-    config.b_config.projects.each { it ->
+    config.b_config.projects.each { project ->
         def builder = "npm"
 
         if (project.builderVersion != "nodejs") {
@@ -9,7 +9,7 @@ def call(Map config) {
         if (project.containsKey('path')) {
             // Run the command if the key exists
             sh """
-            cd ${it.path} && \
+            cd ${project.path} && \
             ${builder} install && \
             ${builder} run ${project.buildCommand ? project.buildCommand : 'build'}
             """
