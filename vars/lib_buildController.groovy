@@ -5,7 +5,7 @@ def call(Map config) {
         builder = "${tool config.b_config.project.builderVersion}/bin/npm"
     }
 
-    def item = config.b_config.containerConfig.find { it.containsKey("path") }
+    def item = config.b_config.project.find { it.containsKey("path") }
     if (item) {
         def path = item.path
 
@@ -16,3 +16,4 @@ def call(Map config) {
         """
     }
 }
+<
