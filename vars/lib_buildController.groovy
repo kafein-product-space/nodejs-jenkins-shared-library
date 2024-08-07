@@ -1,8 +1,8 @@
 def call(Map config) {
     def builder = "npm"
 
-    if (config.b_config.project.builderVersion != "nodejs") {
-        builder = "${tool name: config.b_config.project.builderVersion}/bin/npm"
+    if ( config.b_config.project.builderVersion != "nodejs" ) {
+        builder = "${tool config.b_config.project.builderVersion}/bin/npm"
     }
 
     config.b_config.project.each { it ->
