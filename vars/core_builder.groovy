@@ -178,7 +178,7 @@ def call(Map config) {
             always {
                 script {
                     lib_cleanupController(config)
-                    lib_postbuildController(config)
+                    lib_postBuildController(config)
                 }
             }
             success {
