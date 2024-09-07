@@ -1,6 +1,6 @@
 // vars/lib_containerscan.groovy
 
-def trivyScan(String imageName, String outputDir = 'trivy-reports', String templatePath = '/home/jenkins/.templates/html.tpl', String registryCredentialsId = 'your-credentials-id') {
+def trivyScan(String imageName, String outputDir = 'trivy-reports', String templateDir = '/home/jenkins/.templates') {
     script {
         try {
             echo "Running Trivy scan for image: ${imageName}"
@@ -14,12 +14,12 @@ def trivyScan(String imageName, String outputDir = 'trivy-reports', String templ
             // Generate HTML report using the custom template
             sh """
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-                -v ${templatePath}.cache:/root/.cache/ \
-                -v ${templatePath}:/html.tpl \
+                -v ${templateDir}/.cache:/root/.cache/ \
+                -v ${templateDir}/html.tpl:/html.tpl \
                 aquasec/trivy:latest image \
-                --no-progress --exit-code 1 --format template \
+                --no-progress --exit-code 1 --format template --scanners vuln \
                 --template /html.tpl \
-                --output ${outputDir}/trivy-report-${imageName.replaceAll('/', '_')}.html \
+                --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """
             
