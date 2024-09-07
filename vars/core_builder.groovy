@@ -180,8 +180,6 @@ def call(Map config) {
                     lib_cleanupController(config)
                     lib_postBuildController(config)
                 }
-            }
-            always {
                 // Archive the Trivy HTML report
                 archiveArtifacts artifacts: 'trivy-reports/*.html', allowEmptyArchive: true                
                 // Optionally, you can use the 'Publish HTML Reports' plugin in Jenkins to display the HTML report.
