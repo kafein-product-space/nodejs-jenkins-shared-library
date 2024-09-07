@@ -181,6 +181,14 @@ def call(Map config) {
                     lib_postBuildController(config)
                 }
             }
+            always {
+                // Archive the Trivy HTML report
+                archiveArtifacts artifacts: 'trivy-reports/*.html', allowEmptyArchive: true                
+                // Optionally, you can use the 'Publish HTML Reports' plugin in Jenkins to display the HTML report.
+                publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, 
+                            reportDir: 'trivy-reports', reportFiles: 'trivy-report-*.html', 
+                            reportName: 'Trivy Vulnerability Report'])
+            }
             success {
                 script {
                     def buildTime = lib_teamsnotifications.getBuildTime()
