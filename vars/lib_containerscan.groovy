@@ -5,13 +5,6 @@ def trivyScan(String imageName, String outputDir = 'trivy-reports', String templ
         try {
             echo "Running Trivy scan for image: ${imageName}"
 
-            // Authenticate to Docker registry (if needed)
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: it.credentialsId ? it.credentialsId : "user-nexus", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]) {
-                sh """
-                docker login --username $USERNAME --password $PASSWORD ${container_repository}
-                """
-            }
-
             // Pull Trivy image
             sh "docker pull aquasec/trivy:latest"
 
@@ -21,8 +14,8 @@ def trivyScan(String imageName, String outputDir = 'trivy-reports', String templ
             // Generate HTML report using the custom template
             sh """
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-                -v \$(pwd)/${outputDir}:/root/.cache/ \
-                -v \$(pwd)/${templatePath}:/html.tpl \
+                -v ${templatePath}.cache:/root/.cache/ \
+                -v ${templatePath}:/html.tpl \
                 aquasec/trivy:latest image \
                 --no-progress --exit-code 1 --format template \
                 --template /html.tpl \

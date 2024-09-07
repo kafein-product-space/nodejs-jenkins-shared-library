@@ -72,9 +72,7 @@ def call(Map config) {
                     sh """
                     docker login --username $USERNAME --password $PASSWORD ${container_repository}
                     docker push ${imageTag} && \
-                    docker push ${container_repository}/${repoName}:${config.b_config.imageLatestTag} && \
-                    docker rmi ${imageTag} && \
-                    docker rmi ${container_repository}/${repoName}:${config.b_config.imageLatestTag}
+                    docker push ${container_repository}/${repoName}:${config.b_config.imageLatestTag}
                     """
                 }
             }
@@ -92,6 +90,22 @@ def call(Map config) {
 
     // Run build, push, and scan tasks in parallel
     parallel tasks
+
+    // Define the remove images task
+    def removeImages = {
+        stage("Removing Docker Images") {
+            script {
+                containerImages.each { image ->
+                    sh """
+                    docker rmi ${image} || true
+                    """
+                }
+            }
+        }
+    }
+
+    // Run remove images task after parallel tasks
+    removeImages()
 
     // Assign the container images to the config object for further use
     config.containerImages = containerImages
