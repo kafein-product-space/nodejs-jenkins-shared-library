@@ -18,15 +18,18 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
                 aquasec/trivy:latest image \
                 --no-progress --format template --scanners vuln \
                 --template "@html.tpl" \
+                --exit-code 1 \  // Exit with code 1 on vulnerabilities
+                --severity MEDIUM,HIGH,CRITICAL \
                 --output /${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """, returnStatus: true)  // Capture exit code
 
-            // Check Trivy scan result and set a global environment variable
+            // Handle Trivy scan result
             if (result != 0) {
                 echo "Vulnerabilities found in the image: ${imageName}."
-                currentBuild.result = 'UNSTABLE'
+                currentBuild.result = 'UNSTABLE'  // Mark build as unstable if vulnerabilities are found
                 env.TRIVY_STATUS = "Vulnerabilities found"
+                error "Trivy scan detected vulnerabilities"  // Optionally fail the build
             } else {
                 echo "No vulnerabilities found in the image: ${imageName}."
                 env.TRIVY_STATUS = "Clean"
@@ -43,4 +46,3 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
         }
     }
 }
-

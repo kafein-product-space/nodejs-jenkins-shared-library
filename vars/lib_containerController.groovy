@@ -6,8 +6,8 @@ def call(Map config) {
     }
 
     // Locals
-    def containerImages = []
-    def tasks = [:]  // For parallel execution of build, push, and scan
+    def containerImages = []  // To store image information
+    def tasks = [:]           // For parallel execution
     def container_repository = "${config.container_artifact_repo_address}"
 
     if (config.container_repo != "") {
@@ -32,7 +32,9 @@ def call(Map config) {
         }
 
         def imageTag = "${container_repository}/${repoName}:${config.b_config.imageTag}"
-        containerImages.add("${imageTag} ${dockerFilePath}")
+        def imageLatestTag = "${container_repository}/${repoName}:${config.b_config.imageLatestTag}"
+        
+        containerImages.add([imageTag: imageTag, imageLatestTag: imageLatestTag])  // Store both tags
 
         // Define the build task for the current image
         tasks["${repoName}_build"] = {
@@ -43,7 +45,7 @@ def call(Map config) {
                             sh """
                             docker build \
                                 -t ${imageTag} \
-                                -t ${container_repository}/${repoName}:${config.b_config.imageLatestTag} \
+                                -t ${imageLatestTag} \
                                 -f ${dockerFilePath} \
                                 ${it.contextPath}
                             """
@@ -72,7 +74,7 @@ def call(Map config) {
                     sh """
                     docker login --username $USERNAME --password $PASSWORD ${container_repository}
                     docker push ${imageTag} && \
-                    docker push ${container_repository}/${repoName}:${config.b_config.imageLatestTag}
+                    docker push ${imageLatestTag}
                     """
                 }
             }
@@ -96,8 +98,8 @@ def call(Map config) {
         script {
             containerImages.each { image ->
                 sh """
-                docker rmi ${container_repository}/${image.split()[0]}:${config.b_config.imageLatestTag} || true
-                docker rmi ${image.split()[0]}:${config.b_config.imageTag} || true
+                docker rmi ${image.imageLatestTag} || true
+                docker rmi ${image.imageTag} || true
                 """
             }
         }
