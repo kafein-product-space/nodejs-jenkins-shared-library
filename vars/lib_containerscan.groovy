@@ -21,7 +21,8 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
                 --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """
-
+            sh "chown -R 1000:1000 ${outputDir}"
+            
             echo "Trivy scan completed for image: ${imageName}. HTML report saved in ${outputDir}."
 
             // Archive the report as a Jenkins artifact
