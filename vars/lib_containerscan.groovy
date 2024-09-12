@@ -9,8 +9,8 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
             // Ensure the output directory exists in the Jenkins workspace
             sh "mkdir -p ${outputDir}"
 
-            // Generate HTML report using the custom template and store it in the Jenkins workspace
-            sh """
+            // Run Trivy scan and capture exit code
+            def result = sh(script: """
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
@@ -20,10 +20,20 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
                 --template "@html.tpl" \
                 --output /${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
-            """
-            sh "sudo chown -R 1000:1000 ${outputDir}"
+            """, returnStatus: true)  // Capture exit code
 
-            echo "Trivy scan completed for image: ${imageName}. HTML report saved in ${outputDir}."
+            // Check Trivy scan result and set a global environment variable
+            if (result != 0) {
+                echo "Vulnerabilities found in the image: ${imageName}."
+                currentBuild.result = 'UNSTABLE'
+                env.TRIVY_STATUS = "Vulnerabilities found"
+            } else {
+                echo "No vulnerabilities found in the image: ${imageName}."
+                env.TRIVY_STATUS = "Clean"
+            }
+
+            // Change ownership of the files to Jenkins user (if required)
+            sh "sudo chown -R 1000:1000 ${outputDir}"
 
             // Archive the report as a Jenkins artifact
             archiveArtifacts artifacts: "${outputDir}/trivy-report-${config.b_config.project.name}.html", allowEmptyArchive: false
@@ -33,3 +43,4 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
         }
     }
 }
+
