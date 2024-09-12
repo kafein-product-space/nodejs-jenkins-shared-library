@@ -41,7 +41,7 @@ def call(Map config) {
                     script {
                         try {
                             sh """
-                            docker build --rm  \
+                            docker build \
                                 -t ${imageTag} \
                                 -t ${container_repository}/${repoName}:${config.b_config.imageLatestTag} \
                                 -f ${dockerFilePath} \
