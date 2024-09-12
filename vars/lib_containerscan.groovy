@@ -1,6 +1,6 @@
 // vars/lib_containerscan.groovy
 
-def call(Map config, String imageName, String outputDir = 'trivy-reports', String templateDir = '/home/jenkins/.templates') {
+def trivyscan(Map config, String imageName, String outputDir = 'trivy-reports', String templateDir = '/home/jenkins/.templates') {
     script {
         try {
             echo "Running Trivy scan for image: ${imageName}"
