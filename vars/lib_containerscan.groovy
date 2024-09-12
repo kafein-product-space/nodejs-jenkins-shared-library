@@ -14,11 +14,11 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
-                -v ${outputDir}:${outputDir} \
+                -v ${env.WORKSPACE}/${outputDir}:/${outputDir} \
                 aquasec/trivy:latest image \
                 --no-progress --format template --scanners vuln \
-                --template /html.tpl \
-                --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
+                --template "@html.tpl" \
+                --output /${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """
             sh "sudo chown -R 1000:1000 ${outputDir}"
