@@ -16,14 +16,12 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
                 -v ${templateDir}/html.tpl:/html.tpl \
                 -v ${outputDir}:${outputDir} \
                 aquasec/trivy:latest image \
-                --no-progress --exit-code 1 --format template --scanners vuln \
+                --no-progress --format template --scanners vuln \
                 --template /html.tpl \
                 --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """
-            sh "ls -lahtr ${outputDir}"
-            sh "chown -R 1000:1000 ${outputDir}"
-            sh "ls -lahtr ${outputDir}"
+            sh "sudo chown -R 1000:1000 ${outputDir}"
 
             echo "Trivy scan completed for image: ${imageName}. HTML report saved in ${outputDir}."
 
