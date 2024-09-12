@@ -198,21 +198,6 @@ def call(Map config) {
                     lib_helper.triggerJob(config)
                 }
             }
-            unstable {
-                script {
-                    def buildTime = lib_teamsnotifications.getBuildTime()
-                    def trivyMessage = env.TRIVY_STATUS ?: "Trivy scan status not available"
-                    lib_teamsnotifications('Success', "The build has completed successfully in ${buildTime}. Trivy Scan: ${trivyMessage}.", 'teams-webhook-url')
-                }
-                script {
-                    def publisher = LastChanges.getLastChangesPublisher("PREVIOUS_REVISION", "SIDE", "LINE", true, true, "", "", "", "", "")
-                    publisher.publishLastChanges()
-                    def htmlDiff = publisher.getHtmlDiff()
-                    writeFile file: 'build-diff.html', text: htmlDiff
-
-                    lib_helper.triggerJob(config)
-                }
-            }
             failure {
                 script {
                     def buildTime = lib_teamsnotifications.getBuildTime()
