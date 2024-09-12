@@ -7,7 +7,8 @@ def call(Map config) {
 
     // Locals
     def containerImages = []  // To store image information
-    def tasks = [:]           // For parallel execution
+    def buildTasks = [:]       // For sequential build tasks
+    def pushScanTasks = [:]    // For parallel push and scan tasks
     def container_repository = "${config.container_artifact_repo_address}"
 
     if (config.container_repo != "") {
@@ -37,7 +38,7 @@ def call(Map config) {
         containerImages.add([imageTag: imageTag, imageLatestTag: imageLatestTag])  // Store both tags
 
         // Define the build task for the current image
-        tasks["${repoName}_build"] = {
+        buildTasks["${repoName}_build"] = {
             timeout(time: 25, unit: "MINUTES") {
                 stage("Building ${repoName}") {
                     script {
@@ -68,7 +69,7 @@ def call(Map config) {
         }
 
         // Define the push task for the current image
-        tasks["${repoName}_push"] = {
+        pushScanTasks["${repoName}_push"] = {
             stage("Pushing ${repoName}") {
                 withCredentials([[$class: "UsernamePasswordMultiBinding", credentialsId: it.credentialsId ? it.credentialsId : "user-nexus", usernameVariable: "USERNAME", passwordVariable: "PASSWORD"]]) {
                     sh """
@@ -81,7 +82,7 @@ def call(Map config) {
         }
 
         // Define the scan task for the current image
-        tasks["${repoName}_scan"] = {
+        pushScanTasks["${repoName}_scan"] = {
             stage("Scanning ${repoName} with Trivy") {
                 script {
                     lib_containerscan.trivyScan(config, imageTag)  // Call trivyscan with appropriate arguments
@@ -90,8 +91,11 @@ def call(Map config) {
         }
     }
 
-    // Run build, push, and scan tasks in parallel
-    parallel tasks
+    // Run build tasks sequentially
+    parallel buildTasks
+
+    // Run push and scan tasks in parallel after build tasks complete
+    parallel pushScanTasks
 
     // Run image removal sequentially after parallel tasks complete
     stage("Removing Docker Images") {
