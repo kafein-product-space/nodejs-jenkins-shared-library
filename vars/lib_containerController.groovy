@@ -95,10 +95,10 @@ def call(Map config) {
     def removeImages = {
         stage("Removing Docker Images") {
             script {
-                containerImages.each { image ->
-                    sh """
-                    docker rmi ${image} || true
-                    """
+                sh """
+                    docker rmi ${container_repository}/${repoName}:${config.b_config.imageLatestTag} || true
+                    docker rmi ${imageTag} || true
+                """
                 }
             }
         }
