@@ -11,7 +11,7 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
 
             // Generate HTML report using the custom template and store it in the Jenkins workspace
             sh """
-            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            docker run --rm --user 1000:1000 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
                 -v ${outputDir}:${outputDir} \
@@ -22,7 +22,7 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
                 ${imageName}
             """
             sh "chown -R 1000:1000 ${outputDir}"
-            
+
             echo "Trivy scan completed for image: ${imageName}. HTML report saved in ${outputDir}."
 
             // Archive the report as a Jenkins artifact
