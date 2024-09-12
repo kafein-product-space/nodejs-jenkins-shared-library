@@ -1,4 +1,3 @@
-// README: This library works with Teams Workflows (PowerAutomate app, not connector. You must configure Credentials id and webhook url)
 def call(String status, String message, String credentialsId) {
     def colors = [
         'Success': 'Good',    // green color for success
@@ -10,7 +9,7 @@ def call(String status, String message, String credentialsId) {
     }
 
     def color = colors[status]
-    def title = "Jenkins Build Notification"
+    def title = "Jenkins Notification"
     def jobName = env.JOB_NAME        // Get the Jenkins job name
     def jobLink = env.BUILD_URL       // Get the direct link to the Jenkins job
     def buildNumber = env.BUILD_NUMBER // Get the build number
@@ -77,6 +76,15 @@ def call(String status, String message, String credentialsId) {
                             [
                                 "type": "TextBlock",
                                 "weight": "Bolder",
+                                "color": "Attention",  // Make it red
+                                "text": "Trivy Scan Status: ${env.TRIVY_STATUS}",
+                                "wrap": true,
+                                "isSubtle": false,   // Ensure text is not subtle (underline effect)
+                                "fontType": "Monospace" // Optional: makes it stand out more
+                            ],
+                            [
+                                "type": "TextBlock",
+                                "weight": "Bolder",
                                 "text": "Job Name: ${jobName} (Build #${buildNumber})",
                                 "wrap": true
                             ],
@@ -102,17 +110,4 @@ def call(String status, String message, String credentialsId) {
 
         echo "Response: ${response}"
     }
-}
-
-def getBuildTime() {
-    def durationMillis = currentBuild.duration ?: 0
-
-    // Convert durationMillis to seconds
-    def durationSeconds = (durationMillis / 1000).toLong()
-
-    // Calculate minutes and seconds
-    def minutes = (durationSeconds / 60).toLong()
-    def seconds = (durationSeconds % 60).toLong()
-
-    return "${minutes}m ${seconds}s"
 }
