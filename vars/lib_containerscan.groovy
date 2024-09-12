@@ -14,14 +14,13 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
-                -v ${outputDir}:${outputDir} \  // Mount the Jenkins workspace directory to the container
-                aquasec/trivy:latest image \
+                -v ${outputDir}:${outputDir} \
                 --no-progress --exit-code 1 --format template --scanners vuln \
                 --template /html.tpl \
                 --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
             """
-            
+
             echo "Trivy scan completed for image: ${imageName}. HTML report saved in ${outputDir}."
 
             // Archive the report as a Jenkins artifact
