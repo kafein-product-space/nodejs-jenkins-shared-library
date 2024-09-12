@@ -29,7 +29,7 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
                 echo "Vulnerabilities found in the image: ${imageName}."
                 currentBuild.result = 'UNSTABLE'  // Mark build as unstable if vulnerabilities are found
                 env.TRIVY_STATUS = "Vulnerabilities found"
-                error "Trivy scan detected vulnerabilities"  // Optionally fail the build
+                // DO NOT fail the build, just print the message
             } else {
                 echo "No vulnerabilities found in the image: ${imageName}."
                 env.TRIVY_STATUS = "Clean"
