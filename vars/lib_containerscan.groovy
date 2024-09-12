@@ -1,5 +1,3 @@
-// vars/lib_containerscan.groovy
-
 def trivyScan(Map config, String imageName, String outputDir = 'trivy-reports', String templateDir = '/home/jenkins/.templates') {
     script {
         try {
@@ -8,7 +6,7 @@ def trivyScan(Map config, String imageName, String outputDir = 'trivy-reports', 
             // Pull Trivy image
             sh "docker pull aquasec/trivy:latest"
 
-            // Ensure the output directory exists
+            // Ensure the output directory exists on the Jenkins node
             sh "mkdir -p ${outputDir}"
 
             // Generate HTML report using the custom template
@@ -16,6 +14,7 @@ def trivyScan(Map config, String imageName, String outputDir = 'trivy-reports', 
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
+                -v ${outputDir}:${outputDir} \
                 aquasec/trivy:latest image \
                 --no-progress --exit-code 1 --format template --scanners vuln \
                 --template /html.tpl \
