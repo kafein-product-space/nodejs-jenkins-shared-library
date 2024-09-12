@@ -7,7 +7,7 @@ def call(Map config) {
 
     // Locals
     def containerImages = []
-    def tasks = [:]  // For parallel execution
+    def tasks = [:]  // For parallel execution of build, push, and scan
     def container_repository = "${config.container_artifact_repo_address}"
 
     if (config.container_repo != "") {
@@ -91,20 +91,17 @@ def call(Map config) {
     // Run build, push, and scan tasks in parallel
     parallel tasks
 
-    // Define the remove images task
-    def removeImages = {
-        stage("Removing Docker Images") {
-            script {
+    // Run image removal sequentially after parallel tasks complete
+    stage("Removing Docker Images") {
+        script {
+            containerImages.each { image ->
                 sh """
-                    docker rmi ${container_repository}/${repoName}:${config.b_config.imageLatestTag} || true
-                    docker rmi ${imageTag} || true
+                docker rmi ${container_repository}/${image.split()[0]}:${config.b_config.imageLatestTag} || true
+                docker rmi ${image.split()[0]}:${config.b_config.imageTag} || true
                 """
             }
         }
     }
-
-    // Run remove images task after parallel tasks
-    removeImages()
 
     // Assign the container images to the config object for further use
     config.containerImages = containerImages
