@@ -99,7 +99,6 @@ def call(Map config) {
                     docker rmi ${container_repository}/${repoName}:${config.b_config.imageLatestTag} || true
                     docker rmi ${imageTag} || true
                 """
-                }
             }
         }
     }
