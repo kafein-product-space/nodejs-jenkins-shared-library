@@ -82,7 +82,7 @@ def call(Map config) {
         tasks["${repoName}_scan"] = {
             stage("Scanning ${repoName} with Trivy") {
                 script {
-                    lib_containerscan.trivyScan(imageTag)  // Calling the Trivy scan function from lib_containerscan.groovy
+                    trivyScan(imageTag)  // Calling the Trivy scan function from lib_containerscan.groovy
                 }
             }
         }
