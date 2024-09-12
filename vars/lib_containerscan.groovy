@@ -18,7 +18,7 @@ def trivyScan(Map config, String imageName, String outputDir = "trivy-reports", 
                 aquasec/trivy:latest image \
                 --no-progress --format template --scanners vuln \
                 --template "@html.tpl" \
-                --exit-code 1 \  // Exit with code 1 on vulnerabilities
+                --exit-code 1 \
                 --severity MEDIUM,HIGH,CRITICAL \
                 --output /${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
