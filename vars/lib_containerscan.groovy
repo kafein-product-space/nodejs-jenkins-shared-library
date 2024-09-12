@@ -15,7 +15,7 @@ def trivyScan(Map config, String imageName, String outputDir = "${env.WORKSPACE}
                 -v ${templateDir}/.cache:/root/.cache/ \
                 -v ${templateDir}/html.tpl:/html.tpl \
                 -v ${outputDir}:${outputDir} \
-                --no-progress --exit-code 1 --format template --scanners vuln \
+                --exit-code 1 --format template --scanners vuln \
                 --template /html.tpl \
                 --output ${outputDir}/trivy-report-${config.b_config.project.name}.html \
                 ${imageName}
