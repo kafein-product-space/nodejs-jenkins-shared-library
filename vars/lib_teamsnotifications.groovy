@@ -17,7 +17,7 @@ def call(String status, String message, String credentialsId) {
     }
 
     def color = colors[status]
-    def title = "Jenkins Build Notification"
+    def title = "Jenkins Notification"
     def jobName = env.JOB_NAME        // Get the Jenkins job name
     def jobLink = env.BUILD_URL       // Get the direct link to the Jenkins job
     def buildNumber = env.BUILD_NUMBER // Get the build number
