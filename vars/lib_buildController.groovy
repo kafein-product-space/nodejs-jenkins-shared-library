@@ -8,11 +8,17 @@ def call(Map config) {
         error("Environment variable NPM_AUTH_KEY is not set.")
     }
 
-    // Optionally, create or modify the .npmrc file to include the auth token
-//    writeFile file: "${projectPath}/.npmrc", text: """
-//    @kafein:registry=https://gitlab.netfein.com/api/v4/projects/12/packages/npm/
+    // Remove existing .npmrc file if it exists
+    def npmrcFilePath = "${projectPath}/.npmrc"
+    if (fileExists(npmrcFilePath)) {
+        sh "rm -f ${npmrcFilePath}"
+    }
+
+    // Create a new .npmrc file
+    writeFile file: npmrcFilePath, text: """
+    @kafein:registry=https://gitlab.netfein.com/api/v4/projects/12/packages/npm/
     //gitlab.netfein.com/api/v4/projects/12/packages/npm/:_authToken=${env.NPM_AUTH_KEY}
-//    """
+    """
 
     if (projectConfig.builderVersion != "nodejs") {
         builder = "${tool projectConfig.builderVersion}/bin/npm"
