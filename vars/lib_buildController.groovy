@@ -26,6 +26,7 @@ def call(Map config) {
 
     sh """
     cd ${projectPath} && \
+    ${builder} config list && \
     ${builder} cache clean --force && \
     ${builder} install && \
     ${builder} run ${projectConfig.buildCommand ? projectConfig.buildCommand : 'build'}
