@@ -16,7 +16,8 @@ def call(Map config) {
 
     // Create a new .npmrc file
     writeFile file: npmrcFilePath, text: """
-    @kafein:registry=https://gitlab.netfein.com/api/v4/projects/12/packages/npm/
+    @shared:registry=https://gitlab.netfein.com/api/v4/packages/npm/
+    @integro:registry=https://gitlab.netfein.com/api/v4/packages/npm/
     //gitlab.netfein.com/api/v4/projects/12/packages/npm/:_authToken=${env.NPM_AUTH_KEY}
     """
 
