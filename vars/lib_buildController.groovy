@@ -18,7 +18,7 @@ def call(Map config) {
     writeFile file: npmrcFilePath, text: """
     @shared:registry=https://gitlab.netfein.com/api/v4/packages/npm/
     @integro:registry=https://gitlab.netfein.com/api/v4/packages/npm/
-    //gitlab.netfein.com/api/v4/projects/12/packages/npm/:_authToken=${env.NPM_AUTH_KEY}
+    //gitlab.netfein.com/api/v4/packages/npm/:_authToken=${env.NPM_AUTH_KEY}
     """
 
     if (projectConfig.builderVersion != "nodejs") {
